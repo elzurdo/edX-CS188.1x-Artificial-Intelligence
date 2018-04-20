@@ -72,6 +72,43 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+def graphSearch(problem, fringe, add_to_fringe_fn, verbose=0):
+    closed = set()
+    start = [problem.getStartState(), 0, []]
+    add_to_fringe_fn(fringe, start, 0)
+
+    while not fringe.isEmpty():
+        node, cost, path = fringe.pop()
+        if verbose:
+            print node, path
+
+        if problem.isGoalState(node):
+            #print node
+            #print path
+            return path
+
+        if node not in closed:
+            if verbose:
+                print '~~~~~children~~~~~'
+            # print node
+            closed.add(node)
+
+            for child_node, child_action, child_cost in problem.getSuccessors(node): #[::-1]:
+                if verbose:
+                    print child_action, child_node
+                new_path = path + [child_action]
+                new_cost = cost + child_cost
+
+                #print child_node
+                new_state = [child_node, new_cost, new_path]
+                add_to_fringe_fn(fringe, new_state, new_cost)
+            if verbose:
+                print '-' * 20
+        else:
+            if verbose:
+                print node, ' is in `closed`!'
+
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -86,17 +123,35 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
+    print '-----\nDFS\n------'
+
+    fringe = util.Stack()
+    def add_to_fringe_fn(fringe, state, cost):
+        fringe.push(state)
+
+    return graphSearch(problem, fringe, add_to_fringe_fn)
+
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
+    print '-----\nBFS\n------'
+    fringe = util.Queue()
+    def add_to_fringe_fn(fringe, state, cost):
+        fringe.push(state)
+
+    return graphSearch(problem, fringe, add_to_fringe_fn)
+
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
+    print '-----\nUCS\n------'
+    fringe = util.PriorityQueue()
+    def add_to_fringe_fn(fringe, state, cost):
+        fringe.push(state, cost)
+
+    return graphSearch(problem, fringe, add_to_fringe_fn)
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -108,7 +163,13 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
+    print '-----\nA*\n------'
+    fringe = util.PriorityQueue()
+    def add_to_fringe_fn(fringe, state, cost):
+        new_cost = cost + heuristic(state[0], problem)
+        fringe.push(state, new_cost)
+
+    return graphSearch(problem, fringe, add_to_fringe_fn)
     util.raiseNotDefined()
 
 
