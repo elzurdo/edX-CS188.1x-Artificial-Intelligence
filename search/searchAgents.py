@@ -520,10 +520,28 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
+    #print problem.walls.__dict__.keys() # ['CELLS_PER_INT', 'width', 'data', 'height']
+    #print len(problem.walls.data), len(problem.walls.data[1]), problem.walls.width, problem.walls.height #['data']
+    #print problem.walls.data[position[0]], sum(problem.walls.data[position[0]]) #[position[1]]
+    #print problem.walls.data[0][3:0]
+    #print sum(problem.walls.data[position[0]:])
+    #print problem.walls.data[1:2]
 
     distances = [0]
     for food in foodGrid.asList():
-        distances.append(util.manhattanDistance(position, food))
+        distance = util.manhattanDistance(position, food)
+        wallcount = 0
+
+        xmin = np.min([position[0], food[0]])
+        xmax = np.max([position[0], food[0]])
+        ymin = np.min([position[1], food[1]])
+        ymax = np.max([position[1], food[1]])
+        for wallslist in problem.walls.data[xmin:xmax]:
+            #print np.sum(np.sum(wallslist[ymin:ymax]) > 0)
+            wallcount += np.sum(wallslist[ymin:ymax])
+        wallcount =  np.sum(wallcount > 0)
+        #print wallcount
+        distances.append( distance + wallcount )
     return max(distances)
     #return foodGrid.count()
     #return 0
